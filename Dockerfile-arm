@@ -1,0 +1,14 @@
+FROM 10.200.62.170:31104/tsf_1/nginx:1.13.12_arm_v8
+
+ADD ./dist /usr/share/nginx/html
+
+RUN mkdir -p /data/logs/customs
+
+COPY .nginx.conf /etc/nginx/conf.d
+
+ENV GW_SERVICE ip-apigw
+ENV GW_PORT 11000
+
+EXPOSE 8080
+
+CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
