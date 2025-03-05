@@ -27,8 +27,9 @@
         "dayjs": "^1.11.13",
         "echarts": "5.5.1",
         "element-plus": "^2.9.5",
+        "element-plus-secondary": "^0.6.14",
         "js-file-download": "0.4.12",
-        "lodash-es": "4.17.21",
+        "lodash-es": "^4.17.21",
         "nanoid": "5.0.8",
         "normalize.css": "8.0.1",
         "nprogress": "0.2.0",
@@ -36,9 +37,11 @@
         "pinia-plugin-persistedstate": "3.2.1",
         "qs": "6.12.3",
         "string-format": "2.0.0",
+        "vite-plugin-svg-icons": "^2.0.1",
         "vue": "3.5.12",
         "vue-echarts": "7.0.3",
         "vue-router": "4.4.5",
+        "vue-types": "^6.0.0",
         "vuedraggable": "2.24.3"
     },
     "devDependencies": {
