@@ -12,7 +12,7 @@ import App from "./App.vue";
 // import directives from "./directives";
 // import plugins from "./plugins";
 import router from "./router";
-// import { pinia } from "./stores";
+import pinia from "./stores/pinia";
 // import { addEventListener } from "./utils/frame";
 
 const app = createApp(App);
@@ -20,7 +20,7 @@ const app = createApp(App);
 app.use(router);
 // app.use(plugins);
 // app.use(directives);
-// app.use(pinia);
+app.use(pinia);
 // // 绑定message监听
 // addEventListener();
 

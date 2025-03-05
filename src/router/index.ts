@@ -14,7 +14,7 @@ const router = createRouter({
         {
           path: "/",
           name: "Home",
-          component: () => import("@/views/HomeView.vue"),
+          component: () => import("@/views/data/dataset/index.vue"),
           meta: { title: "首页", keepAlive: true },
         },
         // // 应用中其他路由
