@@ -1,46 +1,43 @@
 // import { useCoreStore } from "@/stores";
-import { createRouter, createWebHashHistory, RouterView } from "vue-router"; // 32k (gzipped: 12.1k)
+import type { RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 const { DEV } = import.meta.env;
 
+// 页面组件
+const Dataset = () => import('@/views/data/dataset/index.vue')
+const Demo = () => import('@/views/data/demo/index.vue')
+const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/dataset',
+    name: 'Home',
+    component: Dataset,
+    meta: {
+      title: '数据集'
+    }
+  },
+  {
+    path: '/demo',
+    name: 'Demo',
+    component: Demo,
+    meta: {
+      title: '测试'
+    }
+  },
+]
+
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes: [
-    {
-      path: "/",
-      component: RouterView,
-      children: [
-        // { path: "/", redirect: "/home" },
-        {
-          path: "/",
-          name: "Home",
-          component: () => import("@/views/data/dataset/index.vue"),
-          meta: { title: "首页", keepAlive: true },
-        },
-        // // 应用中其他路由
-        // ...appRouter,
-        // {
-        //   path: "error",
-        //   name: "error",
-        //   component: () => import("@/views/ErrorView.vue"),
-        //   meta: {
-        //     title: "错误页面",
-        //     keepAlive: true,
-        //   },
-        // },
-        // {
-        //   path: ":pathMatch(.*)*",
-        //   name: "NotFound",
-        //   component: () => import("@/views/ErrorView.vue"),
-        //   meta: {
-        //     title: "404 Not Found",
-        //     keepAlive: true,
-        //   },
-        // },
-      ],
-    },
-  ],
-});
+  history: createWebHistory(),
+  routes
+})
+
+// 路由守卫，可以用来设置页面标题等
+router.beforeEach((to, from, next) => {
+  if (to.meta.title) {
+    document.title = to.meta.title as string
+  }
+  next()
+})
 
 // 全局路由守卫（登录拦截）
 // router.beforeEach(async (to, from, next) => {
@@ -72,4 +69,4 @@ const router = createRouter({
 // //   }
 // });
 
-export default router;
+export default router

@@ -11,7 +11,7 @@ defineProps({
   }
 })
 const emits = defineEmits(['changeSideTreeStatus'])
-const handleClick = val => {
+const handleClick = (val: boolean) => {
   // appStore.setArrowSide(val)
   emits('changeSideTreeStatus', val)
 }
@@ -24,7 +24,7 @@ const handleClick = val => {
     v-if="!isInside"
     class="arrow-side-tree arrow-side-tree-left"
   >
-      <el-icon><ArrowRight /></el-icon>
+      <el-icon><ArrowLeft /></el-icon>
       <!-- <Icon name="icon_left_outlined"><icon_left_outlined class="svg-icon" /></Icon> -->
   </div>
   <div
@@ -32,7 +32,7 @@ const handleClick = val => {
     v-else-if="isInside"
     class="arrow-side-tree arrow-side-tree-right"
   >
-      <el-icon><ArrowLeft /></el-icon>
+  <el-icon><ArrowRight /></el-icon>
       <!-- <Icon name="icon_left_outlined"> <icon_left_outlined class="svg-icon" /></Icon> -->
   </div>
 </template>

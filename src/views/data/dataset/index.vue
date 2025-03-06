@@ -3,12 +3,12 @@ import ArrowSide from '@/views/common/DeResourceArrow.vue'
 import { computed, reactive, ref, shallowRef } from 'vue'
 // import { useAppStoreWithOut } from '@/store/modules/app'
 // @ts-ignore
-import { treeDraggble } from '@/utils/treeDraggble'
-import { DocumentAdd, Edit, FolderOpened, HelpFilled, MoreFilled, Plus, Search } from '@element-plus/icons-vue'
+import { DocumentAdd, Download, Edit, FolderOpened, HelpFilled, Histogram, MoreFilled, Plus, Search, TrendCharts } from '@element-plus/icons-vue'
 // import { ElMessage } from 'element-plus'
 // import { debounce } from 'lodash-es'
+import nothingSelect from '@/assets/img/nothing-select.png'
 import { cloneDeep } from 'lodash-es'
-import { defaultTab, exportPermission, res, state, timestampFormatDate } from './index'
+import { defaultTab, exportPermission, fieldTypeText, res, result, state, timestampFormatDate } from './index'
 
 const defaultNode = {
   name: '',
@@ -30,7 +30,7 @@ const mounted = ref(false)
 const rootManage = ref(false)
 const exportPermissions = computed(() => exportPermission(nodeInfo.weight, nodeInfo.ext))
 const activeName = ref('dataPreview')
-const total = ref(null)
+const total = ref(0)
 const columns = shallowRef([])
 const tableData = shallowRef([])
 const dataPreviewLoading = ref(false)
@@ -59,45 +59,86 @@ const editorDataset = () => {
   console.log('编辑数据集')
 }
 
+let columnsPreview = [] as any[]
+let dataPreview = [] as any[]
+let allFields = [] as any[]
+const datasetTableFiled = ref([])
+
 const handleClick = (tabName: any) => {
   console.log(tabName, 'tabName')
-  // switch (tabName) {
-  //   case 'dataPreview':
-  //     if (columnsPreview.length) {
-  //       columns.value = columnsPreview
-  //       tableData.value = dataPreview
-  //       break
-  //     }
-  //     dataPreviewLoading.value = true
-  //     total.value = null
-  //     getDatasetPreview(nodeInfo.id)
-  //       .then(res => {
-  //         allFields = (res?.allFields as unknown as Field[]) || []
-  //         datasetTableFiled.value = allFields
-  //         columnsPreview = generateColumns((res?.data?.fields as Field[]) || [])
-  //         dataPreview = (res?.data?.data as Array<{}>) || []
-  //         columns.value = columnsPreview
-  //         tableData.value = dataPreview
-  //       })
-  //       .finally(() => {
-  //         dataPreviewLoading.value = false
-  //       })
-  //     getDatasetTotal(nodeInfo.id).then(res => {
-  //       total.value = res
-  //     })
-  //     break
-  //   case 'structPreview':
-  //     columns.value = allFieldsColumns
-  //     tableData.value = allFields
-  //     break
-  //   case 'row':
-  //     break
-  //   case 'column':
-  //     break
-  //   default:
-  //     break
-  // }
+  switch (tabName) {
+    case 'dataPreview':
+      if (columnsPreview.length) {
+        columns.value = columnsPreview
+        tableData.value = dataPreview
+        break
+      }
+      // dataPreviewLoading.value = true
+      // total.value = null
+      // getDatasetPreview(nodeInfo.id)
+      //   .then(res => {
+          allFields = (result?.allFields as unknown as any[]) || []
+          datasetTableFiled.value = allFields
+          columnsPreview = generateColumns((result?.data?.fields as any[]) || [])
+          dataPreview = (result?.data?.data as Array<{}>) || []
+          columns.value = columnsPreview
+          tableData.value = result?.data?.data
+        // })
+        // .finally(() => {
+        //   dataPreviewLoading.value = false
+        // })
+      // getDatasetTotal(nodeInfo.id).then(res => {
+      //   total.value = res
+      // })
+      break
+    case 'structPreview':
+      columns.value = allFieldsColumns
+      tableData.value = allFields
+      break
+    case 'row':
+      break
+    case 'column':
+      break
+    default:
+      break
+  }
 }
+
+
+const generateColumns = (arr: any[]) =>
+  arr.map(ele => ({
+    key: ele.dataeaseName,
+    deType: ele.deType,
+    dataKey: ele.dataeaseName,
+    title: ele.name,
+    width: 150,
+  }))
+
+const allFieldsColumns = [
+  {
+    key: 'name',
+    dataKey: 'name',
+    title: '字段名称',
+    width: 250
+  },
+  {
+    key: 'deType',
+    dataKey: 'deType',
+    title: '字段类型',
+    width: 250,
+    cellRenderer: ({ cellData: deType }: any) => (
+      <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+        {fieldTypeText[deType]}
+      </div>
+    )
+  },
+  {
+    key: 'description',
+    dataKey: 'description',
+    title:'字段备注',
+    width: 250
+  }
+]
 
 const tablePanes = ref([])
 const tablePaneList = computed(() => {
@@ -133,11 +174,6 @@ const mouseleave = () => {
 //   appStore.setArrowSide(false)
 }
 
-const { handleDrop, allowDrop, handleDragStart } = treeDraggble(
-  state,
-  'datasetTree',
-  'dataset',
-)
 
 const handleDatasetTree = (cmd: string, data?: any) => {
     console.log(cmd, data,'cmd, data')
@@ -172,6 +208,8 @@ const handleNodeClick = (data: any) => {
     return
   }
   console.log(data,'data')
+  console.log(result,'result')
+  console.log(res,'res')
   Object.assign(nodeInfo, res)
   // barInfoApi(data.id).then(res => {
   //   const nodeData = res as unknown as Node[]
@@ -181,7 +219,7 @@ const handleNodeClick = (data: any) => {
   //   columnsPreview = []
   //   dataPreview = []
   //   activeName.value = 'dataPreview'
-  //   handleClick(activeName.value)
+    handleClick(activeName.value)
   // })
 }
 
@@ -314,8 +352,6 @@ const handleDelete = (id: string) => {
             :filter-node-method="filterNode"
             expand-on-click-node
             highlight-current
-            @node-drag-start="handleDragStart"
-            @node-drop="handleDrop"
             draggable
             @node-expand="nodeExpand"
             @node-collapse="nodeCollapse"
@@ -389,41 +425,34 @@ const handleDelete = (id: string) => {
             <span :title="nodeInfo.name" class="dataset-name ellipsis">{{ nodeInfo.name }}</span>
             <el-divider style="margin: 0 12px" direction="vertical" />
             <span class="create-user">
-              {{'新建' }}:{{ nodeInfo.creator }}
+              {{'创建人'}}:{{ nodeInfo.creator }}
             </span>
 
-            <el-popover show-arrow :offset="8" placement="bottom" width="290" trigger="hover">
+            <!-- <el-popover show-arrow :offset="8" placement="bottom" width="290" trigger="hover">
               <template #reference>
-                <el-icon size="16px" class="create-user">
-                  <Icon name="icon_info_outlined"><icon_info_outlined class="svg-icon" /></Icon>
-                </el-icon>
+                <el-icon><Warning /></el-icon>
               </template>
               <dataset-detail
                 :create-time="infoList.createTime"
                 :creator="infoList.creator"
               ></dataset-detail>
-            </el-popover>
+            </el-popover> -->
             <div class="right-btn">
               <el-button secondary @click="createPanel('dashboard')">
                 <template #icon>
-                  <Icon name="icon_dashboard_outlined"
-                    ><icon_dashboard_outlined class="svg-icon"
-                  /></Icon>
+                  <el-icon><Histogram /></el-icon>
                 </template>
                 新建仪表板
               </el-button>
               <el-button secondary @click="createPanel('dvCanvas')">
                 <template #icon>
-                  <Icon name="icon_operation-analysis_outlined"
-                    ><icon_operationAnalysis_outlined class="svg-icon"
-                  /></Icon> </template
+                  <el-icon><TrendCharts /></el-icon>
+                  </template
                 >新建数据大屏
               </el-button>
-              <el-button v-if="exportPermissions[0]" secondary @click="exportDataset">
+              <el-button secondary @click="exportDataset">
                 <template #icon>
-                  <Icon name="icon_download_outlined"
-                    ><icon_download_outlined class="svg-icon"
-                  /></Icon>
+                  <el-icon><Download /></el-icon>
                 </template>
                 数据集导出
               </el-button>
@@ -520,7 +549,7 @@ const handleDelete = (id: string) => {
           </template>
           <template v-if="['row', 'column'].includes(activeName)">
             <div class="table-row-column">
-              <XpackComponent
+              <!-- <XpackComponent
                 :active-name="activeName"
                 :dataset-id="nodeInfo.id"
                 jsname="ZGF0YXNldC1yb3ctcGVybWlzc2lvbnM="
@@ -529,14 +558,12 @@ const handleDelete = (id: string) => {
                 :active-name="activeName"
                 :dataset-id="nodeInfo.id"
                 jsname="ZGF0YXNldC1jb2x1bW4tcGVybWlzc2lvbnM="
-              />
+              /> -->
             </div>
           </template>
         </div>
       </template>
-      <template v-else-if="mounted">
-        <empty-background description="请在左侧选择数据集" img-type="select" />
-      </template>
+      <el-empty description="请在左侧选择数据集" :image="nothingSelect" style="margin-top: 300px;" v-if="nodeInfo.id === ''"/>
     </div>
   </div>
 </template>
@@ -665,7 +692,7 @@ const handleDelete = (id: string) => {
 
   .dataset-height,
   .dataset-content {
-    height: calc(100vh - 56px);
+    // height: 100vh;
     overflow: auto;
     position: relative;
   }
@@ -741,7 +768,7 @@ const handleDelete = (id: string) => {
       margin: 24px;
       background: #fff;
       border-radius: 4px;
-      height: calc(100% - 138px);
+      height: calc(100% - 198px);
     }
 
     .preview-num {

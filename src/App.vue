@@ -1,14 +1,15 @@
 <template>
-  <router-view />
+  <Layout />
 </template>
 
 <script setup lang="ts">
-// App root component
+import Layout from './layout/index.vue';
 </script>
 
 <style lang="less">
-#app {
-  width: 100%;
+html, body, #app {
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 </style> 
